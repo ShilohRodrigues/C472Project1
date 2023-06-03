@@ -15,10 +15,10 @@ def main():
     # pd.set_option('display.max_columns', None)
     print("Hello, You will see the decision trees...\n")
     # file_data = input("Please enter the file name:\n")
-    input_data = list(map(str, input("Use a space to give different value. First enter Alternate value, Bar value, \n"
-                                     "Fri/Sat value, Hungry value, Patrons value, Price value, Raining value, \n"
-                                     "Reservation value and Type value: ").split()))
-    print(input_data)
+    # input_data = list(map(str, input("Use a space to give different value. First enter Alternate value, Bar value, \n"
+    #                                 "Fri/Sat value, Hungry value, Patrons value, Price value, Raining value, \n"
+    #                                 "Reservation value and Type value: ").split()))
+    # print(input_data)
 
     # all the rows. array 2d
     dataArr = []
@@ -47,10 +47,10 @@ def main():
 
     print(df2, end='\n')
 
-    decision_tree_construction(df2, columns)
+    decision_tree_construction(df2)
 
 
-def decision_tree_construction(data, columns):
+def decision_tree_construction(data):
     # Create feature vectors
     X = data.drop('willwait', axis=1)
     y = data['willwait']
@@ -66,7 +66,7 @@ def decision_tree_construction(data, columns):
     dtc = classification(X_encoded, y_encoded)
 
     # Print the data tree
-    print(tree.plot_tree(dtc), end='/n')
+    print(tree.plot_tree(dtc), end='\n')
     dot_data = tree.export_graphviz(dtc, out_file=None,
                                     feature_names=ohe.get_feature_names_out(X.columns),
                                     class_names=le.classes_,
@@ -74,7 +74,7 @@ def decision_tree_construction(data, columns):
     graph = graphviz.Source(dot_data)
     graph.render("mytree2")
 
-    #predictFromDataset(dtc, columns)
+    predictFromDataset(dtc, X, ohe, le)
 
 
 def entropy_calculation(instances):
@@ -100,16 +100,13 @@ def classification(x, y):
     dtc.fit(x, y)
     return dtc
 
-# having issue with this method
-def predictFromDataset(dtc, arrCollumns):
+
+def predictFromDataset(dtc, X, ohe, le):
     # Predict new values
     new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
-
-    # Encode strings to numerical features for the target variable
-    le = preprocessing.LabelEncoder()
-    new_data_encoded = le.fit_transform(new_data)
-    #new_data_encoded.reshape(-1, 1)
-
+    # Encode new data set
+    new_data_df = pd.DataFrame(new_data, columns=X.columns)
+    new_data_encoded = ohe.transform(new_data_df)
     # Predict and transform back to string
     y_pred = dtc.predict(new_data_encoded)
     print("Predicted output: ", le.inverse_transform(y_pred))

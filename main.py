@@ -44,7 +44,7 @@ dtc = tree.DecisionTreeClassifier(criterion="entropy")
 dtc.fit(X_encoded, y_encoded)
 
 #Predict new values
-new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
+new_data = [['yes', 'yes', 'yes', 'yes', 'full', '$$$', 'no', 'yes', 'thai', '0-10']]
 #Encode new data set
 new_data_df = pd.DataFrame(new_data, columns=X.columns)
 new_data_encoded = ohe.transform(new_data_df)
