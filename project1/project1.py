@@ -33,7 +33,7 @@ def main():
     # for the first row. the attributes. array 1d
     columns = []
 
-    with open("./training_data.csv", 'r') as file:
+    with open("./project1/training_data.csv", 'r') as file:
         csvreader = csv.reader(file)
         for row in csvreader:
             dataArr.append(row)
@@ -84,7 +84,7 @@ def decision_tree_construction(data):
                                     class_names=le.classes_,
                                     filled=True, rounded=True)
     graph = graphviz.Source(dot_data)
-    graph.render("mytree2")
+    graph.render("./project1/mytree2")
 
     #Enter data into splitting function to evaluate performance
     splitting_criteria(dtc, X_encoded, y_encoded)
