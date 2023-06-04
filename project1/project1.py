@@ -12,9 +12,10 @@ import graphviz
 
 
 def main():
-    # pd.set_option('display.max_columns', None)
     print("Hello, You will see the decision trees...\n")
-    # file_data = input("Please enter the file name:\n")
+    # file_data_entropy = input("Please enter the attribute name for entropy:\n")
+
+    # use this input to ask user
     # input_data = list(map(str, input("Use a space to give different value. First enter Alternate value, Bar value, \n"
     #                                 "Fri/Sat value, Hungry value, Patrons value, Price value, Raining value, \n"
     #                                 "Reservation value and Type value: ").split()))
@@ -47,6 +48,13 @@ def main():
 
     print(df2, end='\n')
 
+    # file_data_entropy varialble
+    entAnswer = df2['pat']
+    le = preprocessing.LabelEncoder()
+    entAnswer = le.fit_transform(entAnswer)
+
+    entropy_calculation(entAnswer)
+
     decision_tree_construction(df2)
 
 
@@ -74,6 +82,7 @@ def decision_tree_construction(data):
     graph = graphviz.Source(dot_data)
     graph.render("mytree2")
 
+    # four parameter input_data array
     predictFromDataset(dtc, X, ohe, le)
 
 
@@ -87,20 +96,26 @@ def entropy_calculation(instances):
 
     # Calculate the entropy using the entropy formula
     entropy = -sum(p * math.log2(p) for p in probabilities if p != 0)
+    print("Entropy is: " + str(entropy), end='\n')
 
     return entropy
 
 
+# ?????????????? don't know what to put
 def splitting_criteria():
     return
 
 
 def classification(x, y):
-    dtc = tree.DecisionTreeClassifier(criterion="entropy")
+    # the criterion take care of the entropy
+    # the splitter parameter take care of selecting the best
+    # feature with the highest information gain
+    # it does do the splitting criteria
+    dtc = tree.DecisionTreeClassifier(criterion="entropy", splitter="best")
     dtc.fit(x, y)
     return dtc
 
-
+# four parameter input_data array
 def predictFromDataset(dtc, X, ohe, le):
     # Predict new values
     new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
