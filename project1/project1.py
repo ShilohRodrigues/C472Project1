@@ -5,6 +5,9 @@ import scipy
 from scipy.stats import entropy as en
 from sklearn import tree
 from sklearn import preprocessing
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 from IPython.display import display, HTML
 import pandas as pd
 import csv
@@ -74,6 +77,7 @@ def decision_tree_construction(data):
     dtc = classification(X_encoded, y_encoded)
 
     # Print the data tree
+    print('\nData Tree is saved under "myTree2.pdf", raw values:' )
     print(tree.plot_tree(dtc), end='\n')
     dot_data = tree.export_graphviz(dtc, out_file=None,
                                     feature_names=ohe.get_feature_names_out(X.columns),
@@ -81,6 +85,9 @@ def decision_tree_construction(data):
                                     filled=True, rounded=True)
     graph = graphviz.Source(dot_data)
     graph.render("mytree2")
+
+    #Enter data into splitting function to evaluate performance
+    splitting_criteria(dtc, X_encoded, y_encoded)
 
     # four parameter input_data array
     predictFromDataset(dtc, X, ohe, le)
@@ -96,13 +103,18 @@ def entropy_calculation(instances):
 
     # Calculate the entropy using the entropy formula
     entropy = -sum(p * math.log2(p) for p in probabilities if p != 0)
-    print("Entropy is: " + str(entropy), end='\n')
+    print("\nEntropy is: " + str(entropy), end='\n')
 
     return entropy
 
-
-# ?????????????? don't know what to put
-def splitting_criteria():
+def splitting_criteria(dtc, X, y):
+    #Split the test data
+    X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.6, random_state=0)
+    y_pred = dtc.predict(X_test)
+    print('\nClassification Report:')
+    print(classification_report(y_test, y_pred))
+    print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
     return
 
 
