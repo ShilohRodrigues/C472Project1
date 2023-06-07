@@ -1,11 +1,10 @@
 import math
 from collections import Counter
-import numpy as np
-import scipy
-from scipy.stats import entropy as en
 from sklearn import tree
 from sklearn import preprocessing
-from IPython.display import display, HTML
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 import pandas as pd
 import csv
 import graphviz
@@ -13,13 +12,12 @@ import graphviz
 
 def main():
     print("Hello, You will see the decision trees...\n")
-    # file_data_entropy = input("Please enter the attribute name for entropy:\n")
+    file_data_entropy = input("Please enter the attribute name for entropy:\n")
 
     # use this input to ask user
-    # input_data = list(map(str, input("Use a space to give different value. First enter Alternate value, Bar value, \n"
-    #                                 "Fri/Sat value, Hungry value, Patrons value, Price value, Raining value, \n"
-    #                                 "Reservation value and Type value: ").split()))
-    # print(input_data)
+    input_data = list(map(str, input("Use a space to give different value. First enter Alternate value, Bar value, \n"
+                                     "Fri/Sat value, Hungry value, Patrons value, Price value, Raining value, \n"
+                                     "Reservation value and Type value: ").split()))
 
     # all the rows. array 2d
     dataArr = []
@@ -30,7 +28,7 @@ def main():
     # for the first row. the attributes. array 1d
     columns = []
 
-    with open("./training_data.csv", 'r') as file:
+    with open("training_data.csv", 'r') as file:
         csvreader = csv.reader(file)
         for row in csvreader:
             dataArr.append(row)
@@ -49,16 +47,16 @@ def main():
     print(df2, end='\n')
 
     # file_data_entropy varialble
-    entAnswer = df2['willwait']
+    entAnswer = df2[file_data_entropy]
     le = preprocessing.LabelEncoder()
     entAnswer = le.fit_transform(entAnswer)
 
     entropy_calculation(entAnswer)
 
-    decision_tree_construction(df2)
+    decision_tree_construction(df2, input_data)
 
 
-def decision_tree_construction(data):
+def decision_tree_construction(data, inputs):
     # Create feature vectors
     X = data.drop('willwait', axis=1)
     y = data['willwait']
@@ -74,16 +72,20 @@ def decision_tree_construction(data):
     dtc = classification(X_encoded, y_encoded)
 
     # Print the data tree
+    print('\nData Tree is saved under "myTree2.pdf", raw values:')
     print(tree.plot_tree(dtc), end='\n')
     dot_data = tree.export_graphviz(dtc, out_file=None,
                                     feature_names=ohe.get_feature_names_out(X.columns),
                                     class_names=le.classes_,
                                     filled=True, rounded=True)
     graph = graphviz.Source(dot_data)
-    graph.render("mytree2")
+    graph.render("./project1/mytree2")
+
+    # Enter data into splitting function to evaluate performance
+    splitting_criteria(dtc, X_encoded, y_encoded)
 
     # four parameter input_data array
-    predictFromDataset(dtc, X, ohe, le)
+    predictFromDataset(dtc, X, ohe, le, inputs)
 
 
 def entropy_calculation(instances):
@@ -96,13 +98,19 @@ def entropy_calculation(instances):
 
     # Calculate the entropy using the entropy formula
     entropy = -sum(p * math.log2(p) for p in probabilities if p != 0)
-    print("Entropy is: " + str(entropy), end='\n')
+    print("\nEntropy is: " + str(entropy), end='\n')
 
     return entropy
 
 
-# ?????????????? don't know what to put
-def splitting_criteria():
+def splitting_criteria(dtc, X, y):
+    # Split the test data
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.6, random_state=0)
+    y_pred = dtc.predict(X_test)
+    print('\nClassification Report:')
+    print(classification_report(y_test, y_pred))
+    print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
     return
 
 
@@ -115,10 +123,11 @@ def classification(x, y):
     dtc.fit(x, y)
     return dtc
 
+
 # four parameter input_data array
-def predictFromDataset(dtc, X, ohe, le):
+def predictFromDataset(dtc, X, ohe, le, data):
     # Predict new values
-    new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
+    new_data = [data]
     # Encode new data set
     new_data_df = pd.DataFrame(new_data, columns=X.columns)
     new_data_encoded = ohe.transform(new_data_df)
