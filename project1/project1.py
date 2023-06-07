@@ -49,7 +49,7 @@ def main():
     print(df2, end='\n')
 
     # file_data_entropy varialble
-    entAnswer = df2['pat']
+    entAnswer = df2['willwait']
     le = preprocessing.LabelEncoder()
     entAnswer = le.fit_transform(entAnswer)
 
