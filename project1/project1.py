@@ -129,8 +129,11 @@ def classification(x, y):
 
 # four parameter input_data array
 def predictFromDataset(dtc, X, ohe, le):
+    input_string = input("Enter a sample input to predict the output: ")
+    new_data = [element.strip() for element in input_string.split(",")]
+    new_data = [new_data]
     # Predict new values
-    new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
+    #new_data = [['no', 'no', 'no', 'yes', 'full', '$', 'no', 'yes', 'french', '0-10']]
     # Encode new data set
     new_data_df = pd.DataFrame(new_data, columns=X.columns)
     new_data_encoded = ohe.transform(new_data_df)
